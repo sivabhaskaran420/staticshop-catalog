@@ -42,4 +42,4 @@ jobs:
         run: npm install || echo "No package.json found"
 
       - name: Done
-        run: echo "Workflow completed"
+        run: echo "Workflow is completed"
