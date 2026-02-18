@@ -1,0 +1,61 @@
+name: StaticShop CI (with Cache)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  validate-json:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Cache step (required)
+      - name: Cache Node Modules
+        id: cache_node
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: cache-2513c3a
+          restore-keys: |
+            cache-
+
+      # Prime step (required name)
+      - name: prime-cache-2513c3a
+        run: |
+          echo "cache-hit=${{ steps.cache_node.outputs.cache-hit }}"
+          if [ "${{ steps.cache_node.outputs.cache-hit }}" = "true" ]; then
+            echo "Cache HIT for cache-2513c3a"
+          else
+            echo "Cache MISS for cache-2513c3a"
+          fi
+
+      # Install deps if package.json exists (safe for static repos)
+      - name: Install Dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm ci || npm install
+          else
+            echo "No package.json found; skipping npm install"
+          fi
+
+      - name: Validate catalog.json format
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('catalog.json', 'utf8')); console.log('JSON is valid');"
+
+      - name: Verification Step - 22f1000626@ds.study.iitm.ac.in
+        run: echo "GitHub Action executed successfully for StaticShop"
+
+      - name: List Files
+        run: ls -la
