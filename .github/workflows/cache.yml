@@ -1,0 +1,45 @@
+name: CI with Cache
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Cache Node Modules
+        id: cache-node
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: cache-2513c3a
+          restore-keys: |
+            cache-
+
+      - name: prime-cache-2513c3a
+        run: |
+          if [ "${{ steps.cache-node.outputs.cache-hit }}" = "true" ]; then
+            echo "Cache HIT for cache-2513c3a"
+          else
+            echo "Cache MISS for cache-2513c3a"
+          fi
+
+      - name: Install Dependencies
+        run: npm install || echo "No package.json found"
+
+      - name: Done
+        run: echo "Workflow completed"
