@@ -1,0 +1,30 @@
+name: StaticShop CI
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  validate-json:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate catalog.json format
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('catalog.json', 'utf8')); console.log('JSON is valid');"
+
+      - name: Verification Step - 22f1000626@ds.study.iitm.ac.in
+        run: echo "GitHub Action executed successfully for StaticShop"
+
+      - name: List Files
+        run: ls -la
